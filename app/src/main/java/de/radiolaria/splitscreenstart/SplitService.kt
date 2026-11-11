@@ -234,7 +234,9 @@ class SplitService : AccessibilityService() {
                 if (!ok) {
                     cb(false)
                 } else {
-                    handler.postDelayed({ cb(startAdjacent(other)) }, 1200)
+                    // Wie von Hand: Navi ist angedockt, die zweite Hälfte zeigt den App-Auswähler.
+                    // Ein normaler Start landet dort (wie Antippen im Auswähler), ohne LAUNCH_ADJACENT.
+                    handler.postDelayed({ cb(bringToFront(other)) }, 1200)
                 }
             }
 
