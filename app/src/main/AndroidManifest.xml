@@ -60,6 +60,14 @@
             android:noHistory="true"
             android:taskAffinity="app.organicmaps"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <!-- Für "Seiten tauschen": Car Scanner ist dann die App, die zuerst vorne ist. -->
+        <activity
+            android:name=".TrampolineCarScanner"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:taskAffinity="com.ovz.carscanner"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
         <service
             android:name=".SplitService"

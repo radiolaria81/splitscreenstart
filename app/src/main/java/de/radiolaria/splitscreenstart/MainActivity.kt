@@ -106,6 +106,19 @@ class MainActivity : Activity() {
             }
         })
 
+        val sides = listOf(false, true)
+        root.addView(label("Seitenanordnung"))
+        root.addView(spinner(
+            listOf("Standard (Navi zuerst, OBD kommt daneben)", "Seiten tauschen (OBD zuerst, Navi kommt daneben)"),
+            sides.indexOf(Prefs.swapped(this))
+        ) { i ->
+            if (Prefs.swapped(this) != sides[i]) {
+                Prefs.setSwapped(this, sides[i])
+                Prefs.setPaused(this, false)
+                refreshStatus()
+            }
+        })
+
         val delays = Prefs.DELAYS_MS
         root.addView(label("Wartezeit nach Navi-Start"))
         root.addView(spinner(delays.map { "${it / 1000} s" }, delays.indexOf(Prefs.delayMs(this))) { i ->

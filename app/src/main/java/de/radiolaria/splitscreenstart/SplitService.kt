@@ -122,58 +122,72 @@ class SplitService : AccessibilityService() {
             return
         }
         val list = Method.sequence(Prefs.method(this), Prefs.lastSuccess(this))
-        runMethod(list, 0, navi, obd)
+        // Welche Seite eine App bekommt, entscheidet das System danach, welche App zuerst vorne ist.
+        // "Seiten tauschen": OBD zuerst nach vorne holen und die Navi daneben legen.
+        if (Prefs.swapped(this)) {
+            log("Seiten getauscht: erst OBD-App nach vorne, dann Navi daneben")
+            if (!bringToFront(obd)) {
+                finishAttempt(false)
+                return
+            }
+            handler.postDelayed({ runMethod(list, 0, obd, navi) }, SWAP_SETTLE_MS)
+        } else {
+            runMethod(list, 0, navi, obd)
+        }
     }
 
-    private fun runMethod(list: List<Method>, i: Int, navi: String, obd: String) {
+    /** anchor = App, die schon im Vollbild vorne ist; other = App, die daneben kommt. */
+    private fun runMethod(list: List<Method>, i: Int, anchor: String, other: String) {
         val m = list[i]
         log("Versuch ${i + 1}/${list.size}: ${m.label}")
-        startMethod(m, navi, obd) { started ->
+        startMethod(m, anchor, other) { started ->
             if (!started) {
-                next(list, i, navi, obd, bringBack = false)
+                next(list, i, anchor, other, bringBack = false)
             } else {
                 handler.postDelayed({
-                    if (isSplitActive(navi, obd)) {
+                    if (isSplitActive(anchor, other)) {
                         log("ERFOLG mit: ${m.label}. Fenster: ${windowSummary()}")
                         Prefs.setLastSuccess(this, m)
                         finishAttempt(true)
                     } else {
                         log("Kein Splitscreen erkannt. Fenster: ${windowSummary()}")
-                        next(list, i, navi, obd, bringBack = true)
+                        next(list, i, anchor, other, bringBack = true)
                     }
                 }, VERIFY_MS)
             }
         }
     }
 
-    private fun next(list: List<Method>, i: Int, navi: String, obd: String, bringBack: Boolean) {
+    private fun next(list: List<Method>, i: Int, anchor: String, other: String, bringBack: Boolean) {
         if (i + 1 >= list.size) {
             log("Kein Verfahren hat den Splitscreen geöffnet. Automatik pausiert.")
-            if (bringBack && !isAppVisible(navi)) bringToFront(navi)
+            // Zum Weiterfahren auf jeden Fall die Navi nach vorne.
+            val navi = Prefs.navi(this)
+            if (bringBack && navi != null && !isAppVisible(navi)) bringToFront(navi)
             finishAttempt(false)
             return
         }
-        if (bringBack && !isAppVisible(navi)) {
-            bringToFront(navi)
-            handler.postDelayed({ runMethod(list, i + 1, navi, obd) }, 2000)
+        if (bringBack && !isAppVisible(anchor)) {
+            bringToFront(anchor)
+            handler.postDelayed({ runMethod(list, i + 1, anchor, other) }, 2000)
         } else {
-            runMethod(list, i + 1, navi, obd)
+            runMethod(list, i + 1, anchor, other)
         }
     }
 
-    private fun startMethod(m: Method, navi: String, obd: String, cb: (Boolean) -> Unit) {
+    private fun startMethod(m: Method, anchor: String, other: String, cb: (Boolean) -> Unit) {
         when (m) {
-            Method.DIRECT -> cb(startObdAdjacent(obd))
+            Method.DIRECT -> cb(startAdjacent(other))
 
             Method.VIA_NAVI_TASK -> {
-                val cls = Trampoline.byNavi[navi]
+                val cls = Trampoline.byAnchor[anchor]
                 if (cls == null) {
-                    log("Für $navi ist kein Navi-Task-Trampolin hinterlegt – übersprungen")
+                    log("Für $anchor ist kein Trampolin hinterlegt – übersprungen")
                     cb(false)
                 } else {
                     val intent = Intent(this, cls)
                         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        .putExtra(Trampoline.EXTRA_OBD, obd)
+                        .putExtra(Trampoline.EXTRA_TARGET, other)
                     cb(tryStart(intent, "Trampolin"))
                 }
             }
@@ -184,7 +198,7 @@ class SplitService : AccessibilityService() {
                 if (!ok) {
                     cb(false)
                 } else {
-                    handler.postDelayed({ cb(startObdAdjacent(obd)) }, 1200)
+                    handler.postDelayed({ cb(startAdjacent(other)) }, 1200)
                 }
             }
 
@@ -192,10 +206,10 @@ class SplitService : AccessibilityService() {
         }
     }
 
-    private fun startObdAdjacent(obd: String): Boolean {
-        val launch = packageManager.getLaunchIntentForPackage(obd) ?: return false
+    private fun startAdjacent(pkg: String): Boolean {
+        val launch = packageManager.getLaunchIntentForPackage(pkg) ?: return false
         launch.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_LAUNCH_ADJACENT)
-        return tryStart(launch, "OBD-App")
+        return tryStart(launch, pkg)
     }
 
     private fun bringToFront(pkg: String): Boolean {
@@ -249,6 +263,7 @@ class SplitService : AccessibilityService() {
      * und OBD beide als App-Fenster sichtbar sind und sich nicht überlappen.
      */
     private fun isSplitActive(navi: String, obd: String): Boolean {
+        // Reihenfolge der Argumente egal.
         val ws = safeWindows()
         if (ws.any { it.type == AccessibilityWindowInfo.TYPE_SPLIT_SCREEN_DIVIDER }) return true
         var naviRect: Rect? = null
@@ -302,6 +317,7 @@ class SplitService : AccessibilityService() {
         private const val SYSTEM_UI = "com.android.systemui"
         private const val VERIFY_MS = 2000L
         private const val COOLDOWN_MS = 10_000L
+        private const val SWAP_SETTLE_MS = 2000L
 
         @Volatile
         var instance: SplitService? = null

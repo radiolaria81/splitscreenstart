@@ -6,7 +6,7 @@ import android.os.Build
 /** Wie der Splitscreen ausgelöst wird. */
 enum class Method(val key: String, val label: String) {
     AUTO("auto", "Automatisch (Verfahren nacheinander probieren)"),
-    VIA_NAVI_TASK("navitask", "Nebeneinander über Navi-Task (ab Android 12L)"),
+    VIA_NAVI_TASK("navitask", "Nebeneinander über Task der ersten App (ab Android 12L)"),
     DIRECT("direct", "Nebeneinander direkt (ab Android 12L)"),
     TOGGLE("toggle", "System-Umschalter Splitscreen (bis Android 12)");
 
@@ -48,6 +48,10 @@ object Prefs {
 
     fun delayMs(c: Context): Int = sp(c).getInt("delay", DEFAULT_DELAY_MS)
     fun setDelayMs(c: Context, ms: Int) = sp(c).edit().putInt("delay", ms).apply()
+
+    /** false: Navi zuerst vorne, OBD kommt daneben. true: OBD zuerst vorne, Navi kommt daneben. */
+    fun swapped(c: Context): Boolean = sp(c).getBoolean("swapped", false)
+    fun setSwapped(c: Context, on: Boolean) = sp(c).edit().putBoolean("swapped", on).apply()
 
     fun enabled(c: Context): Boolean = sp(c).getBoolean("enabled", true)
     fun setEnabled(c: Context, on: Boolean) = sp(c).edit().putBoolean("enabled", on).apply()

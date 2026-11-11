@@ -4,7 +4,7 @@ import android.app.Activity
 import android.content.Intent
 
 /**
- * Unsichtbare Activity für das Verfahren "über den Navi-Task".
+ * Unsichtbare Activity für das Verfahren "über den Task der ersten App" (normal die Navi).
  *
  * Sie wird mit FLAG_ACTIVITY_NEW_TASK gestartet. Weil ihre taskAffinity (siehe Manifest) dem
  * Paketnamen der Navi-App entspricht, legt Android sie oben auf den schon laufenden Navi-Task.
@@ -25,10 +25,10 @@ open class Trampoline : Activity() {
             return
         }
         started = true
-        val obd = intent.getStringExtra(EXTRA_OBD)
-        val launch = obd?.let { packageManager.getLaunchIntentForPackage(it) }
+        val target = intent.getStringExtra(EXTRA_TARGET)
+        val launch = target?.let { packageManager.getLaunchIntentForPackage(it) }
         if (launch == null) {
-            AppLog.add(this, "Trampolin: OBD-App lässt sich nicht starten ($obd)")
+            AppLog.add(this, "Trampolin: Ziel-App lässt sich nicht starten ($target)")
             finish()
             return
         }
@@ -37,20 +37,24 @@ open class Trampoline : Activity() {
         try {
             startActivity(launch)
         } catch (e: Exception) {
-            AppLog.add(this, "Trampolin: Start der OBD-App fehlgeschlagen: $e")
+            AppLog.add(this, "Trampolin: Start von $target fehlgeschlagen: $e")
         }
         finish()
     }
 
     companion object {
-        const val EXTRA_OBD = "obd"
+        const val EXTRA_TARGET = "target"
 
-        /** Navi-Paket -> passende Trampolin-Klasse (taskAffinity steht im Manifest). */
-        val byNavi: Map<String, Class<out Activity>> = mapOf(
+        /**
+         * Paket der App, die schon vorne ist -> passende Trampolin-Klasse (taskAffinity im Manifest).
+         * Normal ist das die Navi, bei "Seiten tauschen" die OBD-App.
+         */
+        val byAnchor: Map<String, Class<out Activity>> = mapOf(
             Prefs.MAGIC_EARTH to TrampolineMagicEarth::class.java,
             "net.osmand" to TrampolineOsmAnd::class.java,
             "net.osmand.plus" to TrampolineOsmAndPlus::class.java,
             "app.organicmaps" to TrampolineOrganicMaps::class.java,
+            Prefs.CAR_SCANNER to TrampolineCarScanner::class.java,
         )
     }
 }
@@ -59,3 +63,4 @@ class TrampolineMagicEarth : Trampoline()
 class TrampolineOsmAnd : Trampoline()
 class TrampolineOsmAndPlus : Trampoline()
 class TrampolineOrganicMaps : Trampoline()
+class TrampolineCarScanner : Trampoline()
