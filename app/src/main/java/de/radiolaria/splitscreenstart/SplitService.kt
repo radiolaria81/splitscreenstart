@@ -122,18 +122,7 @@ class SplitService : AccessibilityService() {
             return
         }
         val list = Method.sequence(Prefs.method(this), Prefs.lastSuccess(this))
-        // Welche Seite eine App bekommt, entscheidet das System danach, welche App zuerst vorne ist.
-        // "Seiten tauschen": OBD zuerst nach vorne holen und die Navi daneben legen.
-        if (Prefs.swapped(this)) {
-            log("Seiten getauscht: erst OBD-App nach vorne, dann Navi daneben")
-            if (!bringToFront(obd)) {
-                finishAttempt(false)
-                return
-            }
-            handler.postDelayed({ runMethod(list, 0, obd, navi) }, SWAP_SETTLE_MS)
-        } else {
-            runMethod(list, 0, navi, obd)
-        }
+        runMethod(list, 0, navi, obd)
     }
 
     /** anchor = App, die schon im Vollbild vorne ist; other = App, die daneben kommt. */
@@ -355,7 +344,6 @@ class SplitService : AccessibilityService() {
         private const val SYSTEM_UI = "com.android.systemui"
         private const val VERIFY_MS = 2000L
         private const val COOLDOWN_MS = 10_000L
-        private const val SWAP_SETTLE_MS = 2000L
 
         @Volatile
         var instance: SplitService? = null

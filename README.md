@@ -28,14 +28,14 @@ Android hat dafür keine einheitliche Schnittstelle für normale Apps, deshalb g
 | Nebeneinander direkt | ab 12L (API 32) | Der Dienst startet die OBD-App selbst mit `FLAG_ACTIVITY_LAUNCH_ADJACENT`. |
 | System-Umschalter | bis 12 | `performGlobalAction(GLOBAL_ACTION_TOGGLE_SPLIT_SCREEN)` dockt die Navi an, danach wird die OBD-App gestartet. Ab Android 13 bietet AOSP diese Aktion nicht mehr an. |
 
-Das Task-Verfahren gibt es für Magic Earth, OsmAnd, OsmAnd+, Organic Maps und Car Scanner (die
-`taskAffinity` muss im Manifest stehen).
+Das Task-Verfahren gibt es für Magic Earth, OsmAnd, OsmAnd+ und Organic Maps (die `taskAffinity`
+muss im Manifest stehen).
 
-## Seitenanordnung
+Beim System-Umschalter läuft es wie von Hand: Navi andocken, dann die OBD-App normal starten. Sie
+landet in der freien Hälfte und lässt sich dort über den App-Auswähler gegen andere Apps tauschen;
+die Navi bleibt fest.
 
-Welche Seite welche App bekommt, legt das System fest, je nachdem, welche App zuerst vorne ist.
-Landet die OBD-App auf der falschen Seite: **Seitenanordnung → Seiten tauschen**. Dann holt der
-Dienst erst die OBD-App ins Vollbild und legt die Navi daneben.
+## Fokus
 
 **Fokus am Ende** (Standard: OBD-App): Nach erfolgreichem Splitscreen wird die gewählte App noch einmal
 über ihr Startsymbol aufgerufen, damit sie den Fokus bekommt. Beendet das auf einem Gerät den

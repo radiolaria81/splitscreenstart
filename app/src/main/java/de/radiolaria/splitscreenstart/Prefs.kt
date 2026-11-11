@@ -49,10 +49,6 @@ object Prefs {
     fun delayMs(c: Context): Int = sp(c).getInt("delay", DEFAULT_DELAY_MS)
     fun setDelayMs(c: Context, ms: Int) = sp(c).edit().putInt("delay", ms).apply()
 
-    /** false: Navi zuerst vorne, OBD kommt daneben. true: OBD zuerst vorne, Navi kommt daneben. */
-    fun swapped(c: Context): Boolean = sp(c).getBoolean("swapped", false)
-    fun setSwapped(c: Context, on: Boolean) = sp(c).edit().putBoolean("swapped", on).apply()
-
     const val FOCUS_OBD = "obd"
     const val FOCUS_NAVI = "navi"
     const val FOCUS_KEEP = "keep"

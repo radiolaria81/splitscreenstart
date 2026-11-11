@@ -106,19 +106,6 @@ class MainActivity : Activity() {
             }
         })
 
-        val sides = listOf(false, true)
-        root.addView(label("Seitenanordnung"))
-        root.addView(spinner(
-            listOf("Standard (Navi zuerst, OBD kommt daneben)", "Seiten tauschen (OBD zuerst, Navi kommt daneben)"),
-            sides.indexOf(Prefs.swapped(this))
-        ) { i ->
-            if (Prefs.swapped(this) != sides[i]) {
-                Prefs.setSwapped(this, sides[i])
-                Prefs.setPaused(this, false)
-                refreshStatus()
-            }
-        })
-
         val focusKeys = listOf(Prefs.FOCUS_OBD, Prefs.FOCUS_NAVI, Prefs.FOCUS_KEEP)
         root.addView(label("Fokus am Ende"))
         root.addView(spinner(listOf("OBD-App", "Navi", "nicht ändern"), focusKeys.indexOf(Prefs.focus(this))) { i ->

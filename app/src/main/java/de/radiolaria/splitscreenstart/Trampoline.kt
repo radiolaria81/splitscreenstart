@@ -46,15 +46,13 @@ open class Trampoline : Activity() {
         const val EXTRA_TARGET = "target"
 
         /**
-         * Paket der App, die schon vorne ist -> passende Trampolin-Klasse (taskAffinity im Manifest).
-         * Normal ist das die Navi, bei "Seiten tauschen" die OBD-App.
+         * Paket der App, die schon vorne ist (die Navi) -> passende Trampolin-Klasse (taskAffinity im Manifest).
          */
         val byAnchor: Map<String, Class<out Activity>> = mapOf(
             Prefs.MAGIC_EARTH to TrampolineMagicEarth::class.java,
             "net.osmand" to TrampolineOsmAnd::class.java,
             "net.osmand.plus" to TrampolineOsmAndPlus::class.java,
             "app.organicmaps" to TrampolineOrganicMaps::class.java,
-            Prefs.CAR_SCANNER to TrampolineCarScanner::class.java,
         )
     }
 }
@@ -63,4 +61,3 @@ class TrampolineMagicEarth : Trampoline()
 class TrampolineOsmAnd : Trampoline()
 class TrampolineOsmAndPlus : Trampoline()
 class TrampolineOrganicMaps : Trampoline()
-class TrampolineCarScanner : Trampoline()
