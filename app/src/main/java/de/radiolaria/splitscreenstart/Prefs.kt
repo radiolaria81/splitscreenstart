@@ -53,6 +53,12 @@ object Prefs {
     fun swapped(c: Context): Boolean = sp(c).getBoolean("swapped", false)
     fun setSwapped(c: Context, on: Boolean) = sp(c).edit().putBoolean("swapped", on).apply()
 
+    const val FOCUS_OBD = "obd"
+    const val FOCUS_NAVI = "navi"
+    const val FOCUS_KEEP = "keep"
+    fun focus(c: Context): String = sp(c).getString("focus", FOCUS_OBD) ?: FOCUS_OBD
+    fun setFocus(c: Context, f: String) = sp(c).edit().putString("focus", f).apply()
+
     fun enabled(c: Context): Boolean = sp(c).getBoolean("enabled", true)
     fun setEnabled(c: Context, on: Boolean) = sp(c).edit().putBoolean("enabled", on).apply()
 

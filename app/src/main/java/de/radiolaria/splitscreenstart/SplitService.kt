@@ -148,7 +148,7 @@ class SplitService : AccessibilityService() {
                     if (isSplitActive(anchor, other)) {
                         log("ERFOLG mit: ${m.label}. Fenster: ${windowSummary()}")
                         Prefs.setLastSuccess(this, m)
-                        finishAttempt(true)
+                        applyFocusThenFinish(anchor, other)
                     } else {
                         log("Kein Splitscreen erkannt. Fenster: ${windowSummary()}")
                         next(list, i, anchor, other, bringBack = true)
@@ -174,6 +174,42 @@ class SplitService : AccessibilityService() {
             runMethod(list, i + 1, anchor, other)
         }
     }
+
+    /**
+     * Fokus nach erfolgreichem Splitscreen auf die gewählte App legen: Sie wird über ihr
+     * Startsymbol noch einmal aufgerufen. Liegt ihr Task schon in einer Splitscreen-Hälfte,
+     * bekommt er damit den Fokus. Danach wird geprüft, ob der Splitscreen noch steht.
+     */
+    private fun applyFocusThenFinish(a: String, b: String) {
+        val target = when (Prefs.focus(this)) {
+            Prefs.FOCUS_OBD -> Prefs.obd(this)
+            Prefs.FOCUS_NAVI -> Prefs.navi(this)
+            else -> null
+        }
+        if (target == null) {
+            finishAttempt(true)
+            return
+        }
+        if (focusedAppPkg() == target) {
+            log("Fokus liegt schon auf $target")
+            finishAttempt(true)
+            return
+        }
+        log("Fokus auf $target legen")
+        bringToFront(target)
+        handler.postDelayed({
+            if (isSplitActive(a, b)) {
+                log("Fokus jetzt auf: ${focusedAppPkg() ?: "unbekannt"}")
+            } else {
+                log("Achtung: Der Fokuswechsel hat den Splitscreen beendet. Unter „Fokus am Ende“ „nicht ändern“ wählen. Fenster: ${windowSummary()}")
+            }
+            finishAttempt(true)
+        }, VERIFY_MS)
+    }
+
+    private fun focusedAppPkg(): String? =
+        safeWindows().firstOrNull { it.isFocused && it.type == AccessibilityWindowInfo.TYPE_APPLICATION }
+            ?.let { pkgOf(it) }
 
     private fun startMethod(m: Method, anchor: String, other: String, cb: (Boolean) -> Unit) {
         when (m) {

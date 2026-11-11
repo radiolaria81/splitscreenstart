@@ -37,6 +37,10 @@ Welche Seite welche App bekommt, legt das System fest, je nachdem, welche App zu
 Landet die OBD-App auf der falschen Seite: **Seitenanordnung → Seiten tauschen**. Dann holt der
 Dienst erst die OBD-App ins Vollbild und legt die Navi daneben.
 
+**Fokus am Ende** (Standard: OBD-App): Nach erfolgreichem Splitscreen wird die gewählte App noch einmal
+über ihr Startsymbol aufgerufen, damit sie den Fokus bekommt. Beendet das auf einem Gerät den
+Splitscreen, steht es im Protokoll; dann „nicht ändern“ wählen.
+
 Ob es geklappt hat, prüft der Dienst über die sichtbaren Fenster (Trennbalken-Fenster oder Navi
 und OBD nebeneinander ohne Überlappung). Klappt kein Verfahren, **pausiert die Automatik**, damit
 im Auto nichts dauernd flackert. „Jetzt testen“ oder eine geänderte Einstellung hebt die Pause auf.

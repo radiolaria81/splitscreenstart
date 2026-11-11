@@ -119,6 +119,12 @@ class MainActivity : Activity() {
             }
         })
 
+        val focusKeys = listOf(Prefs.FOCUS_OBD, Prefs.FOCUS_NAVI, Prefs.FOCUS_KEEP)
+        root.addView(label("Fokus am Ende"))
+        root.addView(spinner(listOf("OBD-App", "Navi", "nicht ändern"), focusKeys.indexOf(Prefs.focus(this))) { i ->
+            if (Prefs.focus(this) != focusKeys[i]) Prefs.setFocus(this, focusKeys[i])
+        })
+
         val delays = Prefs.DELAYS_MS
         root.addView(label("Wartezeit nach Navi-Start"))
         root.addView(spinner(delays.map { "${it / 1000} s" }, delays.indexOf(Prefs.delayMs(this))) { i ->
