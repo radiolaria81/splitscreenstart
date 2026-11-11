@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- typeWindowStateChanged: erkennt, welche App nach vorne kommt.
+     canRetrieveWindowContent + flagRetrieveInteractiveWindows: nötig für getWindows(),
+     damit geprüft werden kann, ob Navi und OBD nebeneinander liegen. Inhalte werden nicht gelesen. -->
+<accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:accessibilityEventTypes="typeWindowStateChanged"
+    android:accessibilityFeedbackType="feedbackGeneric"
+    android:accessibilityFlags="flagRetrieveInteractiveWindows"
+    android:canRetrieveWindowContent="true"
+    android:notificationTimeout="100"
+    android:description="@string/a11y_desc" />

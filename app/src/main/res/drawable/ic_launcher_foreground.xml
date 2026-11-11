@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Zwei Fensterhälften nebeneinander. 108x108-Raster, Inhalt in der 66dp-Sicherheitszone. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:pathData="M30,36 h22 v36 h-22 z"
+        android:fillColor="#FFFFFF" />
+    <path
+        android:pathData="M56,36 h22 v36 h-22 z"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="4"
+        android:fillColor="#00000000" />
+</vector>

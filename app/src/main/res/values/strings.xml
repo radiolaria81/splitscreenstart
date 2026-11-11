@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="a11y_desc">Erkennt, wenn die gewählte Navi-App gestartet wird, und öffnet daneben die gewählte OBD-App im Splitscreen. Liest keine Bildschirminhalte, kein Internetzugriff.</string>
+</resources>

@@ -1,0 +1,47 @@
+name: APK bauen
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: APK
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon assembleRelease
+
+      - name: Als Artefakt ablegen
+        uses: actions/upload-artifact@v4
+        with:
+          name: splitscreenstart-apk
+          path: app/build/outputs/apk/release/*.apk
+
+      - name: Release anlegen, wenn VERSION neu ist
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VER=$(tr -d '[:space:]' < VERSION)
+          if gh release view "v$VER" > /dev/null 2>&1; then
+            echo "Release v$VER gibt es schon – nur Artefakt, kein neues Release."
+            exit 0
+          fi
+          cp app/build/outputs/apk/release/app-release.apk "splitscreenstart-$VER.apk"
+          gh release create "v$VER" "splitscreenstart-$VER.apk" \
+            --title "Splitscreen-Start $VER" \
+            --notes "Build ${{ github.run_number }}, Commit ${{ github.sha }}"

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Kein INTERNET: die App braucht kein Netz. -->
+
+    <!-- Ab Android 11 sieht eine App andere Apps nur, wenn sie das deklariert.
+         Wir brauchen nur Apps mit Startsymbol (für die Auswahllisten und zum Starten). -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+    </queries>
+
+    <application
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:label="Splitscreen-Start"
+        android:theme="@android:style/Theme.Material.NoActionBar">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Trampoline für das Verfahren "über den Navi-Task": Über taskAffinity landet die
+             unsichtbare Activity im laufenden Task der Navi-App und startet von dort aus die
+             OBD-App mit FLAG_ACTIVITY_LAUNCH_ADJACENT. taskAffinity lässt sich nur hier im
+             Manifest setzen, deshalb eine Klasse je unterstützter Navi-App. -->
+        <activity
+            android:name=".TrampolineMagicEarth"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:taskAffinity="com.generalmagic.magicearth"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity
+            android:name=".TrampolineOsmAnd"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:taskAffinity="net.osmand"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity
+            android:name=".TrampolineOsmAndPlus"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:taskAffinity="net.osmand.plus"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity
+            android:name=".TrampolineOrganicMaps"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:taskAffinity="app.organicmaps"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
+        <service
+            android:name=".SplitService"
+            android:exported="true"
+            android:label="Splitscreen-Start"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_service" />
+        </service>
+    </application>
+</manifest>
